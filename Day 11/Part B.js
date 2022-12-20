@@ -3,30 +3,19 @@ import fs from 'fs'
 const sample = fs.readFileSync(`./Day 11/sample.txt`).toLocaleString()
 const puzzle = fs.readFileSync(`./Day 11/puzzle.txt`).toLocaleString()
 
-const parseWorry = (str, old) => {
-  const parts = str.split(' ')
-  const a = parts[0] === 'old' ? old : BigInt(parts[0])
-  const b = parts[2] === 'old' ? old : BigInt(parts[2])
-  if (parts[1] === '+') return a + b
-  if (parts[1] === '*') return a * b
-}
+const reduceBigNum = (num, reducer) => num - Math.floor(num / reducer) * reducer
 
 /**
  * If the worry level drifts too high, you need to reduce it in a way that wouldn't affect the result after dividing ANY of the divisors.
  */
-const parseWorryNew = (str, old, div) => {
+const parseWorry = (str, old, reducer) => {
   const parts = str.split(' ')
-  const a = parts[0] === 'old' ? old : BigInt(parts[0])
-  const b = parts[2] === 'old' ? old : BigInt(parts[2])
-  let worry
-  let mod
-  let ta = +a.toString().slice(a.toString().length - div * 3)
-  let tb = +b.toString().slice(b.toString().length - div * 3)
-  if (parts[1] === '+') worry = ta + tb
-  else if (parts[1] === '*') worry = ta * tb
-  if (parts[1] === '+') mod = (ta + tb) % div
-  else if (parts[1] === '*') mod = (ta * tb) % div
-  return { worry, mod }
+  const a = parts[0] === 'old' ? old : parts[0]
+  const b = parts[2] === 'old' ? old : parts[2]
+  const ra = reduceBigNum(a, reducer)
+  const rb = reduceBigNum(b, reducer)
+  if (parts[1] === '+') return ra + rb
+  else if (parts[1] === '*') return ra * rb
 }
 
 const run = (input) => {
@@ -39,7 +28,7 @@ const run = (input) => {
       items: inputSplit[i * 7 + 1]
         .replace('  Starting items: ', '')
         .split(', ')
-        .map((e) => BigInt(e)),
+        .map((e) => +e),
       operation: inputSplit[i * 7 + 2].replace('  Operation: new = ', ''),
       test: +inputSplit[i * 7 + 3].replace('  Test: divisible by ', ''),
       ifTrue: +inputSplit[i * 7 + 4].replace('    If true: throw to monkey ', ''),
@@ -47,22 +36,24 @@ const run = (input) => {
       inspected: 0,
     })
   }
+  // Big Number Reducer
+  const reducer = monkeys.reduce((p, c) => p * c.test, 1)
   // Rounds
-  for (let r = 0; r < 1000; r++) {
+  for (let r = 0; r < 10000; r++) {
     // Monkey round
     monkeys.forEach((monkey) => {
       // Monkey inspects an item with a worry level
       monkey.items.forEach((item) => {
         // Worry level is operated on
-        let { worry, mod } = parseWorryNew(monkey.operation, item, monkey.test)
-        const thrownTo = mod === 0 ? monkey.ifTrue : monkey.ifFalse
+        let worry = parseWorry(monkey.operation, item, reducer)
+        // Worry is tested and passed on to another monkey
+        const test = worry % monkey.test
+        const thrownTo = test === 0 ? monkey.ifTrue : monkey.ifFalse
         monkeys[thrownTo].items.push(worry)
         monkey.inspected++
       })
       monkey.items = []
     })
-    // console.log(`--- Round ${r + 1} ---`)
-    // console.log(monkeys.map((m) => `${m.name}: ${m.items.toString()}`))
   }
 
   // Answer
@@ -75,5 +66,5 @@ const run = (input) => {
   )
 }
 
-run(sample)
-// run(puzzle)
+// run(sample)
+run(puzzle)
