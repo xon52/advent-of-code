@@ -3,40 +3,40 @@ import fs from 'fs'
 const sample = fs.readFileSync(`./Day 13/sample.txt`).toLocaleString()
 const puzzle = fs.readFileSync(`./Day 13/puzzle.txt`).toLocaleString()
 
-const isNum = (str) => !isNaN(parseInt(str))
-const parseArr = (str) => {
-  console.log('parseArr', str, Array.isArray(str))
-  if (Array.isArray(str)) return str
-  else return str.slice(1, str.length - 1).split(',')
-}
+const isNum = (str) => !isArr(str) && !isNaN(parseInt(str))
+const isArr = (str) => Array.isArray(str)
 
-const compareArrays = (left, right) => {
-  left.every((e, i) => {
-    if (right[i] === undefined) return false
-    else {
-      console.log('compareArrays', left[i], right[i])
-      return compare(left[i], right[i])
-    }
-  })
-  return true
-}
+function compare(a, b) {
+  if (typeof a === 'number' && typeof b === 'number') {
+    return a > b ? false : a < b ? true : undefined
+  } else if (Array.isArray(a) !== Array.isArray(b)) {
+    return compare(Array.isArray(a) ? a : [a], Array.isArray(b) ? b : [b])
+  }
 
-const compare = (left, right) => {
-  console.log('compare', left, right)
-  // Both are integers
-  if (isNum(left) && isNum(right)) return right >= left
-  // Left is number
-  if (isNum(left) && !isNum(right)) return compare([left], parseArr(right))
-  // Right is number
-  if (!isNum(left) && isNum(right)) return compare(parseArr(left), [right])
-  // Both arrays
-  return compareArrays(parseArr(left), parseArr(right))
+  for (let i = 0, end = Math.max(a.length, b.length); i < end; i++) {
+    if (a[i] === undefined) return true
+    if (b[i] === undefined) return false
+    const result = compare(a[i], b[i])
+    if (result !== undefined) return result
+  }
+  return undefined
 }
 
 const run = (input) => {
-  const inputSplit = input.split(`\r\n\r\n`).map((e) => e.split(`\r\n`))
-  console.log(inputSplit.map((e) => compare(e[0], e[1])))
+  const inputSplit = input.split(`\r\n\r\n`).map((e) => e.split(`\r\n`).map((f) => JSON.parse(f)))
+  // console.log(
+  //   inputSplit.forEach((e) => {
+  //     console.log(`\r\n`)
+  //     console.log(`\r\n`)
+  //     console.log(e)
+  //     console.log(`RESULT => ${compare(e[0], e[1])}`)
+  //   })
+  // )
+  const results = inputSplit.map((e) => compare(e[0], e[1]))
+  const sum = results.reduce((p, c, i) => (c ? p + i + 1 : p), 0)
+  console.log(results)
+  console.log(sum)
 }
 
 run(sample)
-// run(puzzle)
+run(puzzle)
