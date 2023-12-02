@@ -1,15 +1,4 @@
-import fs from 'fs';
-import path from 'path';
-import { URL } from 'url';
-const __dirname = new URL('.', import.meta.url).pathname;
-const dir = decodeURI(__dirname.slice(1));
-
-const getData = (target) => {
-	const text = fs.readFileSync(path.join(dir, `${target}.txt`), 'utf8');
-	const rows = text.split(`\r\n`);
-	return rows;
-};
-
+import { getFileData } from '../../helpers/index.js';
 
 const re = /(one|two|three|four|five|six|seven|eight|nine|[0-9])/g;
 
@@ -42,11 +31,11 @@ const getLastNumber = (str) => {
 };
 
 const run = (puzzle) => {
-	const data = getData(puzzle);
+	const data = getFileData(import.meta, puzzle);
 	const firstAndLast = data.map((e) => `${getFirstNumber(e)}${getLastNumber(e)}`);
 	const result = firstAndLast.reduce((prev, curr) => +prev + +curr, 0);
 	console.log(puzzle, result);
 };
 
-// run('sample2');
+run('sample2');
 run('puzzle');
