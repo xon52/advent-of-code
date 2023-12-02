@@ -1,6 +1,6 @@
 import { getFileData } from '../../helpers/index.js';
 
-const re = /(one|two|three|four|five|six|seven|eight|nine|[0-9])/g;
+const numberRegEx = /(one|two|three|four|five|six|seven|eight|nine|[0-9])/g;
 
 const textToDigit = (txt) => {
 	if (txt.match(/^([0-9])$/g)) return +txt;
@@ -18,14 +18,14 @@ const textToDigit = (txt) => {
 
 const getFirstNumber = (str) => {
 	for (let i = 0; i < str.length + 1; i++) {
-		const match = str.substring(0, i).match(re);
+		const match = str.substring(0, i).match(numberRegEx);
 		if (match) return textToDigit(match[0]);
 	}
 };
 
 const getLastNumber = (str) => {
 	for (let i = str.length - 1; i > -1; i--) {
-		const match = str.substring(i).match(re);
+		const match = str.substring(i).match(numberRegEx);
 		if (match) return textToDigit(match[0]);
 	}
 };
