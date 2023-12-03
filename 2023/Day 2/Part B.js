@@ -2,11 +2,10 @@ import { getFileData } from '../../helpers/index.js';
 
 const run = (puzzle) => {
 	const data = getFileData(import.meta, puzzle);
-	// Define round counter
-	const maxColorCounts = [];
-	data.forEach((d, i) => maxColorCounts.push({ game: i + 1, blue: 0, red: 0, green: 0 }));
+	// Define max colour counter
+	const maxColorCounts = data.map((d, i) => ({ game: i + 1, blue: 0, red: 0, green: 0 }));
 	// Process data
-	const sorted = data.map((e, i) => {
+	data.map((e, i) => {
 		// Get game
 		const splitGame = e.split('Game ')[1].split(': ');
 		// Get rounds
