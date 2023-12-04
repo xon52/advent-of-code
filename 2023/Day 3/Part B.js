@@ -38,7 +38,7 @@ const run = (puzzle) => {
 			if (allMatch) numbersToAdd.push(n[0]);
 		});
 	});
-	console.log(foundGears);
+	// console.log(foundGears);
 	let result = 0;
 	Object.values(foundGears)
 		.filter((g) => g.length === 2)
