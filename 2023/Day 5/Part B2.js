@@ -1,3 +1,5 @@
+import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
+
 import { getFileData } from '../../helpers/index.js';
 
 const data = getFileData(import.meta, 'puzzle');
@@ -34,29 +36,30 @@ const getLocation = (seed) => {
 	return seed;
 };
 
-// Get approx
-let min = Infinity;
-let minSeed = undefined;
-let delta = 10000;
-for (let s = 0; s <= seeds.length / 2; s += 2) {
-	const start = seeds[s];
-	const end = seeds[s] + seeds[s + 1];
-	console.log('Pair', s / 2 + 1, seeds[s], seeds[s + 1]);
-	for (let seed = start; seed <= end; seed += delta) {
+if (isMainThread) {
+	// Get approx
+	let min = Infinity;
+	for (let s = 0; s <= seeds.length / 2; s += 2) {
+		const start = seeds[s];
+		const end = seeds[s] + seeds[s + 1];
+
+		const worker = new Worker(`./2023/Day 5/Part B2.js`, { workerData: [start, end] });
+		worker.on('message', (_min) => {
+			if (_min < min) {
+				min = _min;
+				console.log('New min', min);
+			}
+		});
+		worker.on('error', (err) => console.error(err));
+		worker.on('exit', (code) => console.log(`Worker exited with code ${code}.`));
+	}
+} else {
+	const [start, end] = workerData;
+	for (let seed = start; seed <= end; seed++) {
+		let min = Infinity;
 		if (getLocation(seed) < min) {
 			min = getLocation(seed);
-			minSeed = seed;
-			console.log('New min', min, seed);
+			parentPort.postMessage(min);
 		}
-	}
-}
-
-// Get exact
-const start = minSeed - delta;
-const end = minSeed + delta;
-for (let seed = start; seed <= end; seed++) {
-	if (getLocation(seed) < min) {
-		min = getLocation(seed);
-		console.log('New min', min);
 	}
 }
