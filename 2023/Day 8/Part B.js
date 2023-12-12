@@ -12,11 +12,11 @@ const map = {};
 data.slice(2).forEach((e) => (map[e.slice(0, 3)] = [e.slice(7, 10), e.slice(12, 15)]));
 
 if (isMainThread) {
-	let currents = Object.keys(map).filter((e) => e[2] === 'A');
+	let currents = Object.keys(map).filter((e) => e[2] === 'Z');
 	let steps = new Array(currents.length).fill(0);
 
 	for (let n = 0; n < currents.length; n++) {
-		const worker = new Worker(`./2023/Day 8/Part B2.js`, { workerData: { start: currents[n] } });
+		const worker = new Worker(`./2023/Day 8/Part B.js`, { workerData: { start: currents[n] } });
 		worker.on('message', (step) => {
 			steps[n] = step;
 			if (steps.every((s) => s !== 0)) {
@@ -32,11 +32,11 @@ if (isMainThread) {
 	const { start } = workerData;
 	let current = start;
 	let step = 0;
-	while (current[2] !== 'Z') {
+	while (current[2] !== 'A') {
 		for (let i = 0; i < instructions.length; i++) {
 			step++;
 			current = map[current][instructions[i]];
-			if (current[2] === 'Z') break;
+			if (current[2] === 'A') break;
 		}
 	}
 	// console.log(start, current, step);
