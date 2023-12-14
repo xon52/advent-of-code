@@ -14,14 +14,6 @@ getFileData(import.meta, target).forEach((d) => {
 	}
 });
 
-const start = performance.now();
-
-// ===========================================================
-// PART 1
-// ===========================================================
-
-let answer1 = 0;
-
 // Parse a 2d array
 const parse2d = (input) => input.map((row) => row.split(''));
 
@@ -45,6 +37,10 @@ function getReflection(grid, smudge) {
 	return 0;
 }
 
+// ===========================================================
+// PART 1
+// ===========================================================
+let answer1 = 0;
 for (const gridInput of data) {
 	const grid = parse2d(gridInput);
 	const transposed = transpose2DArray(grid);
@@ -52,15 +48,12 @@ for (const gridInput of data) {
 	const horizontal = getReflection(grid, 0);
 	answer1 += 100 * horizontal + vertical;
 }
-
-console.info(`Answer1: ${answer1} after ${(performance.now() - start).toFixed(2)}ms`);
+console.log('Part 1:', answer1);
 
 // ===========================================================
 // PART 2
 // ===========================================================
-
 let answer2 = 0;
-
 for (const gridInput of data) {
 	const grid = parse2d(gridInput);
 	const transposed = transpose2DArray(grid);
@@ -68,5 +61,4 @@ for (const gridInput of data) {
 	const horizontal = getReflection(grid, 1);
 	answer2 += 100 * horizontal + vertical;
 }
-
-console.info(`Answer2: ${answer2} after ${(performance.now() - start).toFixed(2)}ms`);
+console.log('Part 2:', answer2);
