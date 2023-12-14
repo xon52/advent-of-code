@@ -1,5 +1,4 @@
-import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
-import { getFileData, getFilePath } from '../../helpers/index.js';
+import { getFileData } from '../../helpers/index.js';
 
 const target = 'puzzle';
 
