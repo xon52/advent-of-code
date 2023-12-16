@@ -50,3 +50,22 @@ export const rotate2DArrayCounterClockwise = (matrix) => {
 	}
 	return result;
 };
+
+// Create 2d array
+/**
+ * Create a 2d array
+ * @param {number} rows
+ * @param {number} cols
+ * @param {any} fill
+ * @returns {any[][]}
+ */
+export const create2DArray = (rows, cols, fill) => {
+	const result = [];
+	for (let r = 0; r < rows; r++) {
+		result.push([]);
+		for (let c = 0; c < cols; c++) {
+			result[r].push(fill);
+		}
+	}
+	return result;
+};
