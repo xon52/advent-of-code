@@ -13,7 +13,7 @@ export const getFilePath = (importMeta, filename) => {
 export const getFileData = (importMeta, filename, raw = false) => {
 	const __dirname = new URL('.', importMeta.url).pathname;
 	const dir = decodeURI(__dirname.slice(1));
-	const text = fs.readFileSync(path.join('/', dir, `${filename}.txt`), 'utf8');
+	const text = fs.readFileSync(path.join(dir, `${filename}.txt`), 'utf8');
 	const rows = raw ? text : text.split(EOL);
 	return rows;
 };
