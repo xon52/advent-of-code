@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { URL } from 'url';
-import { EOL } from "os";
+import { EOL } from 'os';
 
 export const getFilePath = (importMeta, filename) => {
 	const __filename = filename || path.basename(importMeta.url);
@@ -15,5 +15,6 @@ export const getFileData = (importMeta, filename, raw = false) => {
 	const dir = decodeURI(__dirname.slice(1));
 	const text = fs.readFileSync(path.join(dir, `${filename}.txt`), 'utf8');
 	const rows = raw ? text : text.split(EOL);
+	if (rows[rows.length - 1] === '') rows.pop();
 	return rows;
 };
