@@ -14,16 +14,16 @@ const findStartingPosition = (grid) =>
 			acc = { x, y };
 		}
 		return acc;
-	}, []);
+	}, {});
 
-const getNextPosition = ({ x, y }, direction) => {
+const getNextPosition = (x, y, direction) => {
 	if (direction === 0) return { x, y: y - 1 };
 	if (direction === 1) return { x: x + 1, y };
 	if (direction === 2) return { x, y: y + 1 };
 	if (direction === 3) return { x: x - 1, y };
 };
 
-function getValueAtPosition(grid, { x, y }) {
+function getValueAtPosition(grid, x, y) {
 	if (y < 0 || y >= grid.length || x < 0 || x >= grid[0].length) {
 		return undefined;
 	} else {
@@ -35,22 +35,23 @@ const rotate90Right = (direction) => {
 	return (direction + 1) % 4;
 };
 
-const placeObstruction = (grid, { x, y }) => {
+const placeObstruction = (grid, x, y) => {
 	const gridCopy = JSON.parse(JSON.stringify(grid));
 	gridCopy[y][x] = 'O';
 	return gridCopy;
 };
 
 const isLoop = (grid) => {
-	let position = findStartingPosition(grid);
-	let prevPosition = { x: position.x, y: position.y };
+	let { x, y } = findStartingPosition(grid);
+	let prevX = x;
+	let prevY = y;
 	let direction = 0;
 	let value = '^';
 
 	const visitedPositions = new Set();
 
 	while (value !== undefined) {
-		const positionAndDirection = `${position.y},${position.x},${direction}`;
+		const positionAndDirection = `${y},${x},${direction}`;
 
 		if (visitedPositions.has(positionAndDirection)) {
 			return true;
@@ -58,14 +59,17 @@ const isLoop = (grid) => {
 
 		visitedPositions.add(positionAndDirection);
 
-		prevPosition = { x: position.x, y: position.y };
-		position = getNextPosition(position, direction);
-		value = getValueAtPosition(grid, position);
+		const nextPosition = getNextPosition(x, y, direction);
+		prevX = x;
+		prevY = y;
+		x = nextPosition.x;
+		y = nextPosition.y;
+		value = getValueAtPosition(grid, x, y);
 
 		if (value === '#' || value === 'O') {
 			direction = rotate90Right(direction);
-			position.x = prevPosition.x;
-			position.y = prevPosition.y;
+			x = prevX;
+			y = prevY;
 		}
 	}
 
@@ -80,7 +84,7 @@ const run = (puzzle) => {
 
 	for (let y = 0; y < grid.length; y++) {
 		for (let x = 0; x < grid[0].length; x++) {
-			if (grid[y][x] === '.' && isLoop(placeObstruction(grid, { x, y }))) {
+			if (grid[y][x] === '.' && isLoop(placeObstruction(grid, x, y))) {
 				result++;
 			}
 			console.log(Math.floor((y / grid.length) * 100), '%');
