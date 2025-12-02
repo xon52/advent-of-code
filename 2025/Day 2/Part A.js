@@ -1,33 +1,38 @@
 import { getFileData } from '../../helpers/index.js';
 
-/*
-A circular safe dial numbered 0–99 starts at 50 and is rotated according to a list of left/right instructions, wrapping around as needed; instead of opening the decoy safe, the real goal is to count how many times any rotation leaves the dial pointing exactly at 0.
-*/
+// 11-22 has two invalid IDs, 11 and 22.
+// 95-115 has one invalid ID, 99.
+// 998-1012 has one invalid ID, 1010.
+// 1188511880-1188511890 has one invalid ID, 1188511885.
+// 222220-222224 has one invalid ID, 222222.
+// 1698522-1698528 contains no invalid IDs.
+// 446443-446449 has one invalid ID, 446446.
+// 38593856-38593862 has one invalid ID, 38593859.
+// The rest of the ranges contain no invalid IDs.
+// Adding up all the invalid IDs in this example produces 1227775554.
 
 const run = (puzzle) => {
 	const data = getFileData(import.meta, puzzle);
-	let start = 50;
-	const max = 99;
+	const ranges = data[0].split(',').map((r) => r.split('-').map(Number));
 
-	let count = 0;
-	data.forEach((line) => {
-		const direction = line.slice(0, 1);
-		const steps = +line.slice(1);
-		if (direction === 'L') {
-			start -= steps;
-		} else {
-			start += steps;
-		}
-		start = ((start % (max + 1)) + (max + 1)) % (max + 1);
-		if (start === 0) {
-			count++;
-		}
-		// console.log(start);
-	});
+	const isInvalid = (s) => {
+		if (s.startsWith('0')) return true;
+		if (s.length % 2 === 1) return false;
+		const half = s.length / 2;
+		return Number(s.slice(0, half)) === Number(s.slice(half));
+	};
 
-	console.log(puzzle, count);
+	let sum = 0;
+	for (const [start, end] of ranges) {
+		for (let id = start; id <= end; id++) {
+			if (isInvalid(id.toString())) {
+				sum += id;
+			}
+		}
+	}
+
+	console.log(puzzle, sum);
 };
-
 
 run('sample');
 run('puzzle');
