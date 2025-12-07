@@ -11,6 +11,8 @@ import { getFileData } from '../../helpers/index.js';
 // Finally, the leftmost problem is 356 * 24 * 1 = 8544
 
 const run = (puzzle) => {
+	const startTime = performance.now();
+
 	const data = getFileData(import.meta, puzzle);
 	const rows = data.length;
 	const cols = data[0].length;
@@ -52,7 +54,10 @@ const run = (puzzle) => {
 	const results = columnNumbers.map((numbers, i) => operate(numbers, operators[i]));
 	const total = results.reduce((sum, result) => sum + result, 0);
 
-	console.log(puzzle, total);
+	const endTime = performance.now();
+	const elapsedTime = (endTime - startTime).toFixed(3);
+
+	console.log(puzzle, total, `(${elapsedTime}ms)`);
 }
 
 run('sample');

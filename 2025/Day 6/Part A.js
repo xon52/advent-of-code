@@ -11,6 +11,8 @@ import { getFileData } from '../../helpers/index.js';
 // 64 + 23 + 314 = 401
 
 const run = (puzzle) => {
+	const startTime = performance.now();
+	
 	const data = getFileData(import.meta, puzzle);
 
 	// Parse input: separate number rows from operator row
@@ -54,7 +56,11 @@ const run = (puzzle) => {
 
 	// Sum all column results
 	const total = columnResults.reduce((sum, result) => sum + result, 0);
-	console.log(puzzle, total);
+	
+	const endTime = performance.now();
+	const elapsedTime = (endTime - startTime).toFixed(3);
+	
+	console.log(puzzle, total, `(${elapsedTime}ms)`);
 }
 
 run('sample');
