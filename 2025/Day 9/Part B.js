@@ -8,43 +8,36 @@ const run = (puzzle) => {
 
 	// Returns true if point is inside OR on the boundary (inclusive)
 	const isPointInPolygon = (px, py, polygon) => {
-		let inside = false;
+		let crossings = 0;
 
 		for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
 			const [xi, yi] = polygon[i];
 			const [xj, yj] = polygon[j];
 
-			// Check if point is on this edge (combined with ray casting)
+			// Boundary check: is point on this edge?
 			if (xi === xj && px === xi) {
 				// Vertical edge
 				if (py >= Math.min(yi, yj) && py <= Math.max(yi, yj)) return true;
 			} else if (yi === yj && py === yi) {
 				// Horizontal edge
 				if (px >= Math.min(xi, xj) && px <= Math.max(xi, xj)) return true;
-			} else {
-				// Check if point is on diagonal edge
-				const dx = xj - xi;
-				const dy = yj - yi;
-				const dpx = px - xi;
-				const dpy = py - yi;
-				const cross = dx * dpy - dy * dpx;
+			}
 
-				if (Math.abs(cross) < 1e-9) {
-					const t = dx !== 0 ? dpx / dx : dpy / dy;
-					if (t >= 0 && t <= 1) return true;
-				}
+			// Raycasting: count edge crossings (skip horizontal edges)
+			if (yi !== yj) {
+				const point1Above = yi > py;
+				const point2Above = yj > py;
 
-				// Ray casting: check if ray crosses edge
-				if (yi !== yj) {
-					const intersect = ((yi > py) !== (yj > py)) &&
-						(px < dx * (py - yi) / dy + xi);
-					if (intersect) {
-						inside = !inside;
+				if (point1Above !== point2Above) {
+					const xCrossing = xi + ((xj - xi) * (py - yi)) / (yj - yi);
+					if (px < xCrossing) {
+						crossings++;
 					}
 				}
 			}
 		}
-		return inside;
+
+		return crossings % 2 === 1;
 	};
 
 	// Precompute bounding box of polygon for early rejection
@@ -95,10 +88,22 @@ const run = (puzzle) => {
 
 		// Check if any box edge intersects with any polygon edge
 		const boxEdges = [
-			[[minX, minY], [maxX, minY]], // bottom
-			[[maxX, minY], [maxX, maxY]], // right
-			[[maxX, maxY], [minX, maxY]], // top
-			[[minX, maxY], [minX, minY]]  // left
+			[
+				[minX, minY],
+				[maxX, minY],
+			], // bottom
+			[
+				[maxX, minY],
+				[maxX, maxY],
+			], // right
+			[
+				[maxX, maxY],
+				[minX, maxY],
+			], // top
+			[
+				[minX, maxY],
+				[minX, minY],
+			], // left
 		];
 
 		for (const boxEdge of boxEdges) {
@@ -110,7 +115,7 @@ const run = (puzzle) => {
 		}
 
 		return true;
-	}
+	};
 
 	let largestArea = 0;
 
